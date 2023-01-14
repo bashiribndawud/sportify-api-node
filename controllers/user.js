@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { validateEmail, validatePassword } = require("../utils/validator");
 const bcrypt = require("bcrypt");
-require('dotenv').config();
+const nodemailer = require('nodemailer');
+require("dotenv").config();
 
 const signUpUser = async (req, res) => {
   try {
@@ -52,35 +53,67 @@ const signInUser = async (req, res) => {
     }
 
     const userExist = await User.findOne({ email });
-    if(!userExist){
-        return res.status(400).json({err: "Invalid email or password"})
+    if (!userExist) {
+      return res.status(400).json({ err: "Invalid email or password" });
     }
     const comparePassword = await bcrypt.compare(password, userExist.password);
-    if(!comparePassword){
-        return res.status(400).json({ err: "Invalid email or password" });
+    if (!comparePassword) {
+      return res.status(400).json({ err: "Invalid email or password" });
     }
-    const payload = {id: userExist.id}
-    
+    const payload = { user: { id: userExist.id } };
+
+    console.log(process.env.SECRET);
     const bearerToken = await jwt.sign(payload, process.env.SECRET, {
-        expiresIn: 360000
+      expiresIn: 360000,
     });
-    // set cookie on the client browser
-    res.cookie("token", bearerToken, { expires: new Date(Date.now() + 90000) });
-    const {password: userPassword, ...others} = userExist._doc 
+    res.cookie("token", bearerToken, { expire: new Date() + 9999 });
+    const { password: userpassword, ...others } = userExist._doc;
     return res.status(200).json({
-        msg: "User Signed In",
-        token: `bearer ${bearerToken}`,
-        ...others
-    })
+      msg: "User logged In",
+      token: `bearer ${bearerToken}`,
+      ...others,
+    });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ err: error });
   }
-
 };
 
-const forgotPassword = (req, res) => {
-    
-}
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res
+      .status(400)
+      .json({ err: "Please provide your registered email" });
+  }
+  const user = await User.findOne({ email });
+  if(!user){
+    return res
+      .status(404)
+      .json({ err: "Please provide your registered email" });
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'daudabashiru97@gmail.com',
+        pass: 'abumuhsin001'
+    }
+  })
+  const mailOptions = {
+    from: "daudabashiru97@gmail.com",
+    to: "bashir4windowslive@gmail.com",
+    subject: "Password Reset Link",
+    text: "Texting Password reset",
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`Email Sent: ${info.response}`);
+    }
+  });
+};
 
 module.exports = { signUpUser, signInUser, forgotPassword };
