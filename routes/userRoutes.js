@@ -5,7 +5,7 @@ const isAuthenticated = require('../middleware/auth')
 
 router.post("/signup", signUpUser);
 router.post("/signin", signInUser);
-router.post("/forgot-password", isAuthenticated, forgotPassword);
+router.post("/forgot-password", forgotPassword);
 
 
 
