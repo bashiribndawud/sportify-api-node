@@ -4,7 +4,9 @@ const cors = require('cors');
 const logger = require('morgan');
 const connectDB = require('./config/dbconnect');
 const userRouter = require('./routes/userRoutes')
+const playlistRouter = require('./routes/playlistRouter')
 const app = express();
+const nodemailer = require("nodemailer");
 
 const PORT = process.env.PORT || 8000;
 
@@ -19,6 +21,9 @@ app.use(express.urlencoded({extended: true}));
 
 // api 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/", playlistRouter);
+
+
 
 
 app.listen(PORT, () => {
