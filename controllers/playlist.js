@@ -76,8 +76,33 @@ const deletePlayList = async (req, res) => {
 
 const AddSong = async (req, res) => {
   try {
-    const { songId } = req.params;
-    
+    const { songId, id } = req.params;
+    const playList = await PlayList.findById(id);
+    // const playlistExist = await PlayList.findById(id);
+    if (!playList) {
+      return res.status(400).json({ err: "Playlist does not exist" });
+    }
+    if (playList.songId === songId) {
+      return res.status(400).json({ err: "Song already in playlist" });
+    }
+    playList.songId = songId;
+    await playList.save();
+    return res.status(201).json({success: "Song added to playlist"})
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+};
+
+const deleteSong = async (req, res) => {
+  try {
+    const { songId, id } = req.params;
+    const playlistExist = await PlayList.findById(id);
+    if (!playlistExist) {
+      return res.status(400).json({ err: "Playlist does not exist" });
+    }
+
+    await PlayList.updateOne({ _id: id }, { $unset: { songId: true } });
+    return res.status(200).json({ success: "Song deleted from playlist" });
   } catch (error) {
     return res.status(500).json(error.message);
   }
@@ -90,4 +115,5 @@ module.exports = {
   updatePlayList,
   deletePlayList,
   AddSong,
+  deleteSong,
 };
