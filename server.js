@@ -5,6 +5,7 @@ const logger = require('morgan');
 const connectDB = require('./config/dbconnect');
 const userRouter = require('./routes/userRoutes')
 const playlistRouter = require('./routes/playlistRouter')
+const songRouter = require('./routes/songRouter')
 const app = express();
 const nodemailer = require("nodemailer");
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({extended: true}));
 // api 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/", playlistRouter);
+app.use("/api/v1/songs", songRouter)
 
 
 

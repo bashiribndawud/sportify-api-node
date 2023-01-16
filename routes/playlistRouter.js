@@ -7,6 +7,7 @@ const {
   updatePlayList,
   deletePlayList,
   AddSong,
+  deleteSong,
 } = require("../controllers/playlist");
 const isAuthenticated = require("../middleware/auth");
 
@@ -15,7 +16,8 @@ router.get("/playlists", isAuthenticated, allPlayList);
 router.get("/playlists/:playlistId", isAuthenticated, getOnePlayList);
 router.put("/playlists/:playlistId", isAuthenticated, updatePlayList);
 router.delete("/playlists/:playlistId", isAuthenticated, deletePlayList);
-router.post("/playlists/:songId/songs", isAuthenticated, AddSong);
+router.post("/playlists/:id/:songId/songs", isAuthenticated, AddSong);
+router.delete("/playlists/:id/:songId/songs", isAuthenticated, deleteSong)
 
 module.exports = router;
 
