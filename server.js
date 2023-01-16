@@ -23,7 +23,11 @@ app.use(express.urlencoded({extended: true}));
 // api 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/", playlistRouter);
-app.use("/api/v1/songs", songRouter)
+app.use("/api/v1/songs", songRouter);
+
+app.get("/", (req, res) => {
+    res.send("Welcome to Spotify API with NodeJs")
+})
 
 
 
